@@ -889,14 +889,15 @@ def get_partywise_advanced_payment_amount(
 	ple = frappe.qb.DocType("Payment Ledger Entry")
 	query = (
 		frappe.qb.from_(ple)
-		.select(ple.party, Abs(Sum(ple.amount).as_("amount")))
+		.select(ple.party, Sum(ple.amount).as_("amount"), ple.account)
 		.where(
 			(ple.party_type.isin(party_type))
-			& (ple.amount < 0)
+			# & (ple.amount < 0)
 			& (ple.against_voucher_no == ple.voucher_no)
 			& (ple.delinked == 0)
 		)
-		.groupby(ple.party)
+		.groupby(ple.party, ple.account)
+		# .having(Sum(ple.amount) < 0)
 	)
 
 	if posting_date:
@@ -915,8 +916,15 @@ def get_partywise_advanced_payment_amount(
 		query = query.where(ple.voucher_type.notin(invoice_doctypes))
 
 	data = query.run()
-	if data:
-		return frappe._dict(data)
+
+	party_data = frappe._dict({})
+	for row in data:
+		if row[1] < 0:
+			party_data.setdefault(row[0], 0)
+			party_data[row[0]] += abs(row[1])
+
+	if party_data:
+		return party_data
 
 
 def get_default_contact(doctype: str, name: str) -> str | None:
