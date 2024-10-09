@@ -1057,7 +1057,9 @@ def update_billing_percentage(pr_doc, update_modified=True, adjust_incoming_rate
 		returned_qty = flt(item_wise_returned_qty.get(item.name))
 		returned_amount = flt(returned_qty) * flt(item.rate)
 		pending_amount = flt(item.amount) - returned_amount
-		total_billable_amount = pending_amount if item.billed_amt <= pending_amount else item.billed_amt
+		total_billable_amount = (
+			pending_amount if abs(item.billed_amt) <= abs(pending_amount) else item.billed_amt
+		)
 
 		total_amount += total_billable_amount
 		total_billed_amount += flt(item.billed_amt)
@@ -1109,7 +1111,7 @@ def get_item_wise_returned_qty(pr_doc):
 			filters=[
 				["Purchase Receipt", "docstatus", "=", 1],
 				["Purchase Receipt", "is_return", "=", 1],
-				["Purchase Receipt Item", "purchase_receipt_item", "in", items],
+				["Purchase Receipt Item", "name", "in", items],
 			],
 			group_by="`tabPurchase Receipt Item`.purchase_receipt_item",
 			as_list=1,
