@@ -897,7 +897,7 @@ def get_partywise_advanced_payment_amount(
 			& (ple.delinked == 0)
 		)
 		.groupby(ple.party, ple.account)
-		# .having(Sum(ple.amount) < 0)
+		.having(Sum(ple.amount) < 0)
 	)
 
 	if posting_date:
@@ -919,9 +919,8 @@ def get_partywise_advanced_payment_amount(
 
 	party_data = frappe._dict({})
 	for row in data:
-		if row[1] < 0:
-			party_data.setdefault(row[0], 0)
-			party_data[row[0]] += abs(row[1])
+		party_data.setdefault(row[0], 0)
+		party_data[row[0]] += abs(row[1])
 
 	if party_data:
 		return party_data
