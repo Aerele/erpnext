@@ -317,7 +317,7 @@ class TestPOSInvoice(IntegrationTestCase):
 		)
 
 		pos.append(
-			"payments", {"mode_of_payment": "Cash", "account": "Cash - _TC", "amount": 1000, "default": 1}
+			"payments", {"mode_of_payment": "Cash", "account": "Cash - _TC", "amount": 2000, "default": 1}
 		)
 
 		pos.insert()
@@ -328,6 +328,7 @@ class TestPOSInvoice(IntegrationTestCase):
 
 		# partial return 1
 		pos_return1.get("items")[0].qty = -1
+		pos_return1.insert()
 		pos_return1.submit()
 		pos_return1.reload()
 
