@@ -117,9 +117,10 @@ class BankClearance(Document):
 					)
 
 				else:
-					frappe.db.set_value(
-						d.payment_document, d.payment_entry, "clearance_date", d.clearance_date
-					)
+					# Not triggering notification if it is set with set_value
+					doc = frappe.get_doc(d.payment_document, d.payment_entry)
+					doc.clearance_date = d.clearance_date
+					doc.save()
 
 				clearance_date_updated = True
 

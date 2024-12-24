@@ -406,7 +406,10 @@ def set_voucher_clearance(doctype, docname, clearance_date, self):
 			)
 			return
 
-		frappe.db.set_value(doctype, docname, "clearance_date", clearance_date)
+		# Not triggering notification if it is set with set_value
+		doc = frappe.get_doc(doctype, docname)
+		doc.clearance_date = clearance_date
+		doc.save()
 
 	elif doctype == "Bank Transaction":
 		# For when a second bank transaction has fixed another, e.g. refund
