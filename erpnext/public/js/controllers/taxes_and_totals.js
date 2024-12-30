@@ -860,13 +860,22 @@ erpnext.taxes_and_totals = class TaxesAndTotals extends erpnext.payments {
 			);
 		}
 
-		this.frm.doc.payments.find(payment => {
+		let mop_with_amount_idx = 0
+		let default_mop_idx = 0
+		this.frm.doc.payments.forEach(payment => {
 			if (payment.default) {
-				payment.amount = total_amount_to_pay;
-			} else {
-				payment.amount = 0
+				default_mop_idx = payment.idx;
+				// payment.amount = total_amount_to_pay;
+			} elif(payment.amount) {
+				mop_with_amount_idx = payment.idx;
 			}
 		});
+		if (default_mop_idx)
+			this.frm.doc.payments[default_mop_idx].amount = total_amount_to_pay
+		elif (mop_with_amount_idx)
+			this.frm.doc.payments[mop_with_amount_idx].amount = total_amount_to_pay
+		elif (len(this.frm.doc.payments))
+			this.frm.doc.payments[0].amount = total_amount_to_pay
 
 		this.frm.refresh_fields();
 	}
