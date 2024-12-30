@@ -837,7 +837,9 @@ erpnext.TransactionController = class TransactionController extends erpnext.taxe
 	}
 
 	validate() {
+		this.apply_pricing_rule()
 		this.calculate_taxes_and_totals(false);
+
 	}
 
 	update_stock() {
@@ -1003,10 +1005,13 @@ erpnext.TransactionController = class TransactionController extends erpnext.taxe
 			this.frm.transaction_date = this.frm.doc.transaction_date;
 			frappe.ui.form.trigger(this.frm.doc.doctype, "currency");
 		}
+		this.apply_pricing_rule()
 	}
 
 	posting_date() {
+		debugger
 		var me = this;
+		me.apply_pricing_rule()
 		if (this.frm.doc.posting_date) {
 			this.frm.posting_date = this.frm.doc.posting_date;
 
