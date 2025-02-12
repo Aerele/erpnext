@@ -1064,15 +1064,10 @@ class PaymentEntry(AccountsController):
 	def set_amounts_in_company_currency(self):
 		self.base_paid_amount, self.base_received_amount, self.difference_amount = 0, 0, 0
 		if self.paid_amount:
-			self.base_paid_amount = flt(
-				flt(self.paid_amount) * flt(self.source_exchange_rate), self.precision("base_paid_amount")
-			)
+			self.base_paid_amount = flt(self.paid_amount) * flt(self.source_exchange_rate)
 
 		if self.received_amount:
-			self.base_received_amount = flt(
-				flt(self.received_amount) * flt(self.target_exchange_rate),
-				self.precision("base_received_amount"),
-			)
+			self.base_received_amount = flt(self.received_amount) * flt(self.target_exchange_rate)
 
 	def calculate_base_allocated_amount_for_reference(self, d) -> float:
 		base_allocated_amount = 0
@@ -1144,21 +1139,29 @@ class PaymentEntry(AccountsController):
 		if self.payment_type == "Receive" and self.base_total_allocated_amount < (
 			self.base_paid_amount + deductions_to_consider
 		):
-			self.unallocated_amount = (
-				self.base_paid_amount
-				+ deductions_to_consider
-				- self.base_total_allocated_amount
-				- included_taxes
-			) / self.source_exchange_rate
+			self.unallocated_amount = flt(
+				(
+					self.base_paid_amount
+					+ deductions_to_consider
+					- self.base_total_allocated_amount
+					- included_taxes
+				)
+				/ self.source_exchange_rate,
+				self.precision("unallocated_amount"),
+			)
 		elif self.payment_type == "Pay" and self.base_total_allocated_amount < (
 			self.base_received_amount - deductions_to_consider
 		):
-			self.unallocated_amount = (
-				self.base_received_amount
-				- deductions_to_consider
-				- self.base_total_allocated_amount
-				- included_taxes
-			) / self.target_exchange_rate
+			self.unallocated_amount = flt(
+				(
+					self.base_received_amount
+					- deductions_to_consider
+					- self.base_total_allocated_amount
+					- included_taxes
+				)
+				/ self.target_exchange_rate,
+				self.precision("unallocated_amount"),
+			)
 
 	def set_exchange_gain_loss(self):
 		exchange_gain_loss = flt(
