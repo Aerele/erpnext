@@ -147,6 +147,8 @@ class Employee(NestedSet):
 	def validate_date(self):
 		if self.date_of_birth and getdate(self.date_of_birth) > getdate(today()):
 			throw(_("Date of Birth cannot be greater than today."))
+		if self.date_of_birth == self.date_of_joining:
+			throw("Date of Birth and Joining Date should not be same")
 
 		self.validate_from_to_dates("date_of_birth", "date_of_joining")
 		self.validate_from_to_dates("date_of_joining", "date_of_retirement")
